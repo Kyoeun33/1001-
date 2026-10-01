@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>채용공고 통합 검색</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 40px 18px;
+            background: #f3f5f8;
+            color: #202938;
+            font-family: Arial, "Malgun Gothic", sans-serif;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { text-align: center; margin: 8px 0 10px; }
+        .sub { text-align: center; color: #667085; margin-bottom: 28px; }
+        form { display: flex; gap: 10px; margin-bottom: 24px; }
+        input {
+            flex: 1; min-width: 0; padding: 14px 16px;
+            border: 1px solid #cbd5e1; border-radius: 9px;
+            font-size: 16px; background: white;
+        }
+        button {
+            border: 0; border-radius: 9px; padding: 0 25px;
+            background: #2563eb; color: white; font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover { background: #1d4ed8; }
+        .summary { margin: 18px 0; font-weight: bold; }
+        .job {
+            background: white; border: 1px solid #e5e7eb;
+            border-radius: 10px; padding: 18px 20px;
+            margin: 12px 0; box-shadow: 0 2px 8px #1018280a;
+        }
+        .site {
+            display: inline-block; padding: 4px 9px;
+            border-radius: 20px; background: #eef2ff;
+            color: #4338ca; font-size: 12px; font-weight: bold;
+        }
+        .job h3 { margin: 10px 0 7px; font-size: 18px; }
+        .job h3 a { color: #172033; text-decoration: none; }
+        .job h3 a:hover { color: #2563eb; text-decoration: underline; }
+        .company { color: #667085; margin: 0 0 10px; }
+        .open { color: #2563eb; text-decoration: none; font-size: 14px; }
+        .message {
+            background: white; border-radius: 9px; padding: 18px;
+            color: #667085; line-height: 1.6;
+        }
+        .error {
+            background: #fff1f2; border: 1px solid #fecdd3;
+            color: #9f1239; padding: 12px 15px;
+            border-radius: 8px; margin: 10px 0;
+        }
+        .notice { color: #667085; font-size: 13px; line-height: 1.6; margin-top: 24px; }
+        @media (max-width: 520px) {
+            body { padding: 24px 12px; }
+            form { flex-direction: column; }
+            button { padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>채용공고 통합 검색</h1>
+    <p class="sub">인크루트와 잡코리아의 채용공고를 한 번에 검색합니다.</p>
+
+    <form method="POST" action="/">
+        <input
+            type="text"
+            name="keyword"
+            value="{{ keyword }}"
+            placeholder="예: 기계설계, CAD, 신입"
+            required
+        >
+        <button type="submit">검색</button>
+    </form>
+
+    {% for error in errors %}
+        <div class="error">{{ error }}</div>
+    {% endfor %}
+
+    {% if keyword %}
+        <div class="summary">'{{ keyword }}' 검색 결과: {{ jobs|length }}건</div>
+    {% endif %}
+
+    {% if jobs %}
+        {% for job in jobs %}
+            <div class="job">
+                <span class="site">{{ job.site }}</span>
+                <h3><a href="{{ job.link }}" target="_blank" rel="noopener noreferrer">{{ job.title }}</a></h3>
+                <p class="company">{{ job.company }}</p>
+                <a class="open" href="{{ job.link }}" target="_blank" rel="noopener noreferrer">원본 공고 보기 ↗</a>
+            </div>
+        {% endfor %}
+    {% elif keyword and not errors %}
+        <div class="message">
+            검색 결과가 없습니다. 사이트가 크롤링을 차단했거나 검색 결과의 HTML 구조가 변경되었을 수 있습니다.
+        </div>
+    {% elif keyword %}
+        <div class="message">
+            공고를 가져오지 못했습니다. 위 오류 내용을 확인해 주세요.
+        </div>
+    {% else %}
+        <div class="message">검색어를 입력하고 검색 버튼을 눌러 주세요.</div>
+    {% endif %}
+
+    <p class="notice">
+        참고: 채용 사이트의 페이지 구조나 접근 정책이 변경되면 크롤링이 작동하지 않을 수 있습니다.
+        실제 배포 전에는 각 사이트에서 검색 결과가 정상적으로 수집되는지 확인하세요.
+    </p>
+</div>
+</body>
+</html>
